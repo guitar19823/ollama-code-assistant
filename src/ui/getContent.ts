@@ -386,6 +386,10 @@ export const getContent = () => {
             
             elements.output.innerHTML = '';
             mdText = '';
+
+            vscode.postMessage({
+              command: 'clearInput',
+            });
           }
 
           // Функция для очистки ввода
@@ -464,6 +468,10 @@ export const getContent = () => {
           try {
             vscode.postMessage({
               command: 'getModels',
+            });
+
+            vscode.postMessage({
+              command: 'getLatestResponse',
             });
           } catch (e) {
             console.error('Post message error:', e);

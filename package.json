@@ -1,17 +1,37 @@
 {
-  "name": "ai-assistant",
-  "displayName": "AI assistant",
-  "description": "AI assistant",
-  "version": "0.0.1",
-  "publisher": "AI Tools",
+  "name": "ollama-code-assistant",
+  "displayName": "Ollama Code Assistant",
+  "description": "A powerful AI code assistant for VS Code that integrates with Ollama to provide intelligent code assistance and natural language processing capabilities.",
+  "version": "1.0.0",
+  "publisher": "Alexey",
   "engines": {
     "vscode": "^1.99.0"
   },
   "categories": [
-    "Other"
+    "Other",
+    "Programming Languages",
+    "Machine Learning"
   ],
+  "keywords": [
+    "ai",
+    "assistant",
+    "ollama",
+    "code",
+    "completion",
+    "intelligence",
+    "llm",
+    "programming"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/guitar19823/ollama-code-assistant.git"
+  },
+  "bugs": {
+    "url": "https://github.com/guitar19823/ollama-code-assistant/issues"
+  },
+  "homepage": "https://github.com/guitar19823/ollama-code-assistant#readme",
   "activationEvents": [],
-  "main": "./out/extension.js",
+  "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
@@ -56,17 +76,20 @@
     "webviews": [
       {
         "id": "my-ai-plugin",
-        "title": "ИИ Результаты"
+        "title": "AI Results"
       }
     ]
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
+    "vscode:prepublish": "npm run package-extension",
+    "package-extension": "webpack --mode production --devtool hidden-source-map",
+    "compile": "webpack --mode development",
+    "watch": "webpack --mode development --watch",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src",
-    "test": "vscode-test"
+    "test": "vscode-test",
+    "package": "vsce package",
+    "publish": "vsce publish"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",
@@ -77,7 +100,10 @@
     "@vscode/test-cli": "^0.0.10",
     "@vscode/test-electron": "^2.4.1",
     "eslint": "^9.23.0",
-    "typescript": "^5.8.2"
+    "ts-loader": "^9.5.2",
+    "typescript": "^5.8.2",
+    "webpack": "^5.99.7",
+    "webpack-cli": "^6.0.1"
   },
   "icon": "icons/three-neurons.png"
 }

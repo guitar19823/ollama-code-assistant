@@ -1,6 +1,6 @@
-# AI Assistant Extension for VS Code
+# Ollama Code Assistant for VS Code
 
-A powerful AI assistant extension for VS Code that integrates with Ollama to provide intelligent code assistance and natural language processing capabilities.
+A powerful AI code assistant for VS Code that integrates with Ollama to provide intelligent code assistance and natural language processing capabilities.
 
 ## Features
 
@@ -11,38 +11,11 @@ A powerful AI assistant extension for VS Code that integrates with Ollama to pro
 * **Code Highlighting**: Beautiful syntax highlighting for code blocks in responses
 * **Markdown Support**: Rich text formatting in AI responses
 
-## Installation
-
-1. Clone the repository to your local directory:
-   ```bash
-   git clone https://github.com/your-repository/ai-assistant.git
-   ```
-
-2. Navigate to the extension directory:
-   ```bash
-   cd ai-assistant
-   ```
-
-3. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-4. Build the extension:
-   ```bash
-   npm run compile
-   ```
-
-5. Install the extension in VS Code:
-   ```bash
-   code --install-extension ai-assistant-0.0.1.vsix
-   ```
-
 ## Usage
 
 1. Open VS Code
-2. Access the AI Assistant through:
-   - The sidebar icon (AI Assistant)
+2. Access the Ollama Code Assistant through:
+   - The sidebar icon (Ollama Code Assistant)
    - The command palette (`Ctrl+Shift+P` or `Cmd+Shift+P`)
    - The context menu in TypeScript files
 

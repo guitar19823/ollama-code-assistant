@@ -1,22 +1,18 @@
-<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
-  <!-- Фон -->
-  <rect x="0" y="0" width="128" height="128" rx="16" fill="#1E1E1E" />
-  
-  <!-- Пять нейронов - двухслойная структура -->
-  <!-- Верхний слой (входной) - 2 нейрона -->
-  <circle cx="40" cy="40" r="9" fill="#FFFFFF" />
-  <circle cx="88" cy="40" r="9" fill="#FFFFFF" />
-  
-  <!-- Нижний слой (выходной) - 3 нейрона -->
-  <circle cx="30" cy="88" r="9" fill="#FFFFFF" />
-  <circle cx="64" cy="88" r="9" fill="#FFFFFF" />
-  <circle cx="98" cy="88" r="9" fill="#FFFFFF" />
-  
-  <!-- Соединяющие линии от верхнего к нижнему слою -->
-  <line x1="40" y1="40" x2="30" y2="88" stroke="#FFFFFF" stroke-width="2" />
-  <line x1="40" y1="40" x2="64" y2="88" stroke="#FFFFFF" stroke-width="2" />
-  <line x1="40" y1="40" x2="98" y2="88" stroke="#FFFFFF" stroke-width="2" />
-  <line x1="88" y1="40" x2="30" y2="88" stroke="#FFFFFF" stroke-width="2" />
-  <line x1="88" y1="40" x2="64" y2="88" stroke="#FFFFFF" stroke-width="2" />
-  <line x1="88" y1="40" x2="98" y2="88" stroke="#FFFFFF" stroke-width="2" />
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect x="0" y="0" width="24" height="24" rx="3" fill="#1E1E1E" />
+  <!-- Top layer (input) - 2 neurons -->
+  <circle cx="7.5" cy="7.5" r="1.7" fill="#FFFFFF" />
+  <circle cx="16.5" cy="7.5" r="1.7" fill="#FFFFFF" />
+  <!-- Bottom layer (output) - 3 neurons -->
+  <circle cx="5.6" cy="16.5" r="1.7" fill="#FFFFFF" />
+  <circle cx="12" cy="16.5" r="1.7" fill="#FFFFFF" />
+  <circle cx="18.4" cy="16.5" r="1.7" fill="#FFFFFF" />
+  <!-- Connecting lines from top to bottom layer -->
+  <line x1="7.5" y1="7.5" x2="5.6" y2="16.5" stroke="#FFFFFF" stroke-width="0.4" />
+  <line x1="7.5" y1="7.5" x2="12" y2="16.5" stroke="#FFFFFF" stroke-width="0.4" />
+  <line x1="7.5" y1="7.5" x2="18.4" y2="16.5" stroke="#FFFFFF" stroke-width="0.4" />
+  <line x1="16.5" y1="7.5" x2="5.6" y2="16.5" stroke="#FFFFFF" stroke-width="0.4" />
+  <line x1="16.5" y1="7.5" x2="12" y2="16.5" stroke="#FFFFFF" stroke-width="0.4" />
+  <line x1="16.5" y1="7.5" x2="18.4" y2="16.5" stroke="#FFFFFF" stroke-width="0.4" />
 </svg>

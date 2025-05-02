@@ -1,10 +1,12 @@
 import * as vscode from "vscode";
 import { getContent } from "./getContent";
 import * as api from "../model/api";
+import { getLineBreak } from "../lib/getLineBreak";
 
 class ViewProvider implements vscode.WebviewViewProvider {
   private _view?: vscode.WebviewView;
   private _context: vscode.ExtensionContext;
+  private _lastResponse: string = '';
 
   constructor(context: vscode.ExtensionContext) {
     this._context = context;
@@ -38,6 +40,17 @@ class ViewProvider implements vscode.WebviewViewProvider {
           vscode.window.showInformationMessage('Selected model: ' + model);
           this._context.globalState.update('model', model);
           break;
+
+        case "getLatestResponse":
+          this._view?.webview.postMessage({
+            command: "ollamaResponse",
+            text: this._lastResponse,
+          });
+          break;
+
+        case "clearInput":
+          this._lastResponse = '';
+          break;
       }
     });
   }
@@ -56,6 +69,8 @@ class ViewProvider implements vscode.WebviewViewProvider {
     const model: string | undefined = this._context.globalState.get('model');
 
     if (this._view && model) {
+        this._lastResponse = prompt + getLineBreak();
+
       return api.generate({
         prompt,
         model,
@@ -67,6 +82,8 @@ class ViewProvider implements vscode.WebviewViewProvider {
   };
 
   private _generateResponse = (text: string) => {
+    this._lastResponse += text;
+
     if (this._view) {
       this._view.webview.postMessage({
         command: "ollamaResponse",
