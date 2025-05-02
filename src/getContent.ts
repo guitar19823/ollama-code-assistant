@@ -25,9 +25,15 @@ export const getContent = () => {
           height: 100%;
           width: 100%;
           padding: 10px;
+          background: #111;
+          color: white;
         }
         #outputPanel {
-          margin-bottom: 10px;
+          position: absolute;
+          top: 50px;
+          left: 10px;
+          right: 10px;
+          height: calc(100% - 205px);
         }
         #output {
           background: #333;
@@ -36,32 +42,36 @@ export const getContent = () => {
           white-space: pre-wrap;
           min-height: 50px;
           font-size: 14px;
+          max-height: calc(100% - 35px);
+          overflow: hidden;
+          overflow-y: scroll;
         }
         button {
-          padding: 5px 10px;
+          height: 25px;
+          padding: 0 10px;
           border-color: transparent;
           outline: none;
         }
         #form {
-          margin-bottom: 10px;
           height: auto;
           position: absolute;
           bottom: 10px;
           left: 10px;
           right: 10px;
         }
-        #promptInput {
+        #input {
           background: #333;
           margin-bottom: 10px;
           padding: 7px 10px;
           resize: none;
-          color: white;
           width: 100%;
+          height: 100px;
           border-color: transparent;
           outline: none;
           font-size: 12px;
+          color: white;
         }
-        #promptInput:focus {
+        #input:focus {
           border-color: transparent;
         }
       </style>
@@ -70,31 +80,28 @@ export const getContent = () => {
       <h1>Ollama Interface</h1>
 
       <div id="outputPanel">
-        <p id="output"></p>
-        <button onclick="callClear()">Clear</button>
+        <p id="output" class="scroll"></p>
+        <button onclick="onClearOutput()">Clear</button>
       </div>
 
       <div id="form">
-        <textarea class="scroll" id="promptInput" autofocus placeholder="Enter your prompt" rows="10"></textarea>
-        <button onclick="callOllama()">Generate</button>
+        <textarea class="scroll" id="input" autofocus placeholder="Enter your prompt"></textarea>
+        <button onclick="onCallOllama()">Generate</button>
+        <button onclick="onClearInput()">Clear</button>
       </div>
 
       <script>
-        // Получаем VS Code API
         const vscode = acquireVsCodeApi();
 
-        function callOllama() {
-          const prompt = document.getElementById('promptInput').value;
+        function onUpdateOutput(text) {
+          const outputElement = document.getElementById('output');
 
-          if (prompt) {
-            vscode.postMessage({
-              command: 'callOllama',
-              prompt: prompt || 'Write a Python function to reverse a string'
-            });
+          if (outputElement) {
+            outputElement.textContent += text;
           }
         }
 
-        function callClear() {
+        function onClearOutput() {
           const outputElement = document.getElementById('output');
 
           if (outputElement) {
@@ -102,24 +109,47 @@ export const getContent = () => {
           }
         }
 
-        window.addEventListener('message', event => {
-          const message = event.data;
+        function onClearInput() {
+          const inputElement = document.getElementById('input');
 
-          if (message.command === 'ollamaResponse') {
-            // Получаем элемент и обновляем его содержимое
-            const outputElement = document.getElementById('output');
+          if (inputElement) {
+            inputElement.value = '';
+          }
+        }
 
-            if (outputElement) {
-              outputElement.textContent += message.text;
-            }
+        function onCallOllama() {
+          const outputElement = document.getElementById('output');
+          const inputElement = document.getElementById('input');
+
+          if (outputElement) {
+            outputElement.textContent = inputElement.value + '\n\n';
           }
 
-          if (message.command === 'clear') {
-            const outputElement = document.getElementById('output');
-
-            if (outputElement) {
-              outputElement.textContent = '';
+          if (inputElement) {
+            try {
+              vscode.postMessage({
+                command: 'callOllama',
+                prompt: inputElement.value,
+              });
+            } catch (e) {
+              console.log(e);
             }
+
+            inputElement.value = '';
+          }
+        }
+
+        window.addEventListener('message', event => {
+          const { command, text } = event.data;
+
+          switch (command) {
+            case 'ollamaResponse':
+              onUpdateOutput(text);
+              break;
+
+            case 'clear':
+              onClearOutput();
+              break;
           }
         });
       </script>
