@@ -3,6 +3,7 @@
   "displayName": "AI assistant",
   "description": "AI assistant",
   "version": "0.0.1",
+  "publisher": "AI Tools",
   "engines": {
     "vscode": "^1.99.0"
   },
@@ -24,6 +25,31 @@
           "when": "editorLangId == 'typescript'",
           "command": "askAi",
           "group": "1_modification"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "askAi",
+          "when": "view == ai-assistant-view",
+          "group": "navigation"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "ai-assistant-sidebar",
+          "title": "AI Assistant",
+          "icon": "icons/three-neurons.svg"
+        }
+      ]
+    },
+    "views": {
+      "ai-assistant-sidebar": [
+        {
+          "id": "ai-assistant-view",
+          "name": "AI Assistant",
+          "type": "webview"
         }
       ]
     },

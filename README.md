@@ -1,32 +1,94 @@
-# AI Assistant Extension
+# AI Assistant Extension for VS Code
 
-Этот расширение предоставляет функциональность помощника на основе искусственного интеллекта (ИИ) для VS Code. Оно позволяет тебе выполнять различные задачи и получать ответы на вопросы с помощью ИИ.
+A powerful AI assistant extension for VS Code that integrates with Ollama to provide intelligent code assistance and natural language processing capabilities.
 
-## Функциональность
+## Features
 
-* Поддержка запросов на естественном языке
-* Возможность выполнения математических операций и предоставления результатов
-* Поддержка генерации кода на основе заданных параметров
-* Возможность предоставления информации по различным темам
+* **AI-Powered Code Assistance**: Get intelligent code suggestions and explanations
+* **Natural Language Processing**: Ask questions and get detailed responses
+* **Multiple Model Support**: Choose from various AI models including Llama 2, Mistral, Code Llama, and more
+* **Seamless Integration**: Access AI features directly from VS Code's sidebar
+* **Code Highlighting**: Beautiful syntax highlighting for code blocks in responses
+* **Markdown Support**: Rich text formatting in AI responses
 
-## Установка
+## Installation
 
-1. Клонируйте репозиторий в локальную директорию: `git clone https://github.com/ваш-репозиторий.git`
-2. Перейдите в директорию расширения: `cd ai-assistant`
-3. Выполните команду `npm install` для установки зависимостей
-4. Запустите VS Code и установите расширение с помощью команды `code --install-extension ai-assistant-0.0.1.vsix`
+1. Clone the repository to your local directory:
+   ```bash
+   git clone https://github.com/your-repository/ai-assistant.git
+   ```
 
-## Использование
+2. Navigate to the extension directory:
+   ```bash
+   cd ai-assistant
+   ```
 
-1. Откройте панель команд в VS Code: `Ctrl + Shift + P` (Windows/Linux) или `Cmd + Shift + P` (macOS)
-2. Введите команду `AI Assistant: Запрос` и нажмите Enter
-3. Введите свой вопрос или запрос на естественном языке
+3. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-## Требования
+4. Build the extension:
+   ```bash
+   npm run compile
+   ```
 
-* VS Code 1.64 или выше
-* Node.js 14 или выше
+5. Install the extension in VS Code:
+   ```bash
+   code --install-extension ai-assistant-0.0.1.vsix
+   ```
 
-## Лицензия
+## Usage
 
-Этот проект распространяется под лицензией MIT.
+1. Open VS Code
+2. Access the AI Assistant through:
+   - The sidebar icon (AI Assistant)
+   - The command palette (`Ctrl+Shift+P` or `Cmd+Shift+P`)
+   - The context menu in TypeScript files
+
+3. Select your preferred AI model from the dropdown
+4. Enter your prompt in the input field
+5. Press `Run` or use `Ctrl+Enter`/`Cmd+Enter` to submit
+
+## Requirements
+
+* VS Code 1.99.0 or higher
+* Node.js 20.x or higher
+* Ollama installed and running locally
+
+## Configuration
+
+The extension requires Ollama to be running locally. Make sure you have:
+1. Ollama installed on your system
+2. At least one AI model pulled (e.g., llama2, mistral, codellama)
+
+## Features in Detail
+
+### Code Assistance
+- Get code suggestions and explanations
+- Receive help with debugging
+- Generate code based on natural language descriptions
+
+### Natural Language Processing
+- Ask questions about programming concepts
+- Get explanations of complex topics
+- Receive detailed answers to technical questions
+
+### UI Features
+- Clean, modern interface
+- Syntax highlighting for code blocks
+- Markdown support for rich text formatting
+- Easy model selection
+- Quick access through VS Code's sidebar
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Support
+
+If you encounter any issues or have suggestions, please open an issue in the repository.

@@ -1,41 +1,28 @@
 import * as vscode from "vscode";
-import View from "./View";
+import ViewProvider from "./ui/ViewProvider";
 
 export function activate(context: vscode.ExtensionContext) {
+  // Регистрация провайдера для Side Bar
+  const provider = new ViewProvider(context);
+  
+  context.subscriptions.push(
+    vscode.window.registerWebviewViewProvider('ai-assistant-view', provider)
+  );
+
+  // Регистрация команды для кнопки в панели быстрого доступа
   context.subscriptions.push(
     vscode.commands.registerCommand("askAi", async () => {
       const editor = vscode.window.activeTextEditor;
+      let prompt = "";
 
-      if (!editor) {
-        return;
+      if (editor) {
+        prompt = editor.document.getText(editor.selection);
       }
 
-      const prompt = editor.document.getText(editor.selection);
-
-      if (!prompt) {
-        return;
-      }
-      
-      try {
-        const view = new View(vscode, context);
-        
-        view.clean();
-        
-        await view.generate(prompt);
-      } catch (error) {
-        switch (true) {
-          case error instanceof Error:
-            vscode.window.showErrorMessage(error.message);
-            break;
-
-          case typeof error === 'string':
-            vscode.window.showErrorMessage(error);
-            break;
-
-          default:
-            vscode.window.showErrorMessage('Unexpected error');
-        }
-      }
+      // Показываем view в сайдбаре
+      await vscode.commands.executeCommand('workbench.view.extension.ai-assistant-sidebar');
+      provider.addOutput(prompt);
+      await provider.generate(prompt);
     })
   );
 }
@@ -43,63 +30,3 @@ export function activate(context: vscode.ExtensionContext) {
 export function deactivate() {
   console.log("Extension deactivated!");
 }
-
-
-// // 1. Получить токен авторизации
-// axios.post('https://api.ollama.com/auth/login', {
-//   username: 'ваш_логин',
-//   password: 'ваш_пароль'
-// })
-// .then(response => {
-//   const token = response.data.token;
-//   // ...
-// });
-
-// // 2. Получить информацию о пользователе
-// axios.get('https://api.ollama.com/user/info', {
-//   headers: {
-//     Authorization: `Bearer ваш_токен_авторизации`
-//   }
-// })
-// .then(response => {
-//   const userInfo = response.data;
-//   // ...
-// });
-
-// // 3. Отправить текст для обработки
-// axios.post('https://api.ollama.com/process', {
-//   text: 'текст_для_обработки'
-// }, {
-//   headers: {
-//     Authorization: `Bearer ваш_токен_авторизации`
-//   }
-// })
-// .then(response => {
-//   const responseText = response.data;
-//   // ...
-// });
-
-// // 4. Получить ответ от модели
-// axios.get('https://api.ollama.com/response', {
-//   headers: {
-//     Authorization: `Bearer ваш_токен_авторизации`
-//   }
-// })
-// .then(response => {
-//   const responseText = response.data;
-//   // ...
-// });
-
-// // 5. Отправить запрос на генерацию текста
-// axios.post('https://api.ollama.com/generate', {
-//   prompt: 'промпт_для_генерации',
-//   max_tokens: число
-// }, {
-//   headers: {
-//     Authorization: `Bearer ваш_токен_авторизации`
-//   }
-// })
-// .then(response => {
-//   const generatedText = response.data;
-//   // ...
-// });
