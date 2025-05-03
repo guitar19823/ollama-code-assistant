@@ -1,12 +1,20 @@
-import * as vscode from "vscode";
-import { getContent } from "./getContent";
-import * as api from "../model/api";
-import { getLineBreak } from "../lib/getLineBreak";
+import * as vscode from 'vscode';
+import * as api from '../model/api';
+import { getContent } from './getContent';
 
 class ViewProvider implements vscode.WebviewViewProvider {
   private _view?: vscode.WebviewView;
   private _context: vscode.ExtensionContext;
-  private _lastResponse: string = '';
+  private _streaming: { stop: () => void } | null = null;
+
+  private _seanses = new Map<
+    number,
+    {
+      prompt: string;
+      response: string;
+      streamId: string;
+    }
+  >();
 
   constructor(context: vscode.ExtensionContext) {
     this._context = context;
@@ -15,80 +23,108 @@ class ViewProvider implements vscode.WebviewViewProvider {
   public resolveWebviewView(
     webviewView: vscode.WebviewView,
     _context: vscode.WebviewViewResolveContext,
-    __token: vscode.CancellationToken,
+    _token: vscode.CancellationToken
   ) {
     this._view = webviewView;
 
     this._view.webview.options = {
       enableScripts: true,
-      localResourceRoots: [this._context.extensionUri]
+      localResourceRoots: [this._context.extensionUri],
     };
 
     this._view.webview.html = getContent();
 
-    this._view.webview.onDidReceiveMessage(async ({command, prompt, model}: any) => {
+    this._view.webview.onDidReceiveMessage(async ({ command, prompt, model }: any) => {
       switch (command) {
-        case "onCallOllama":
+        case 'runStreaming':
           await this.generate(prompt);
           break;
 
-        case "getModels":
+        case 'stopStreaming':
+          this._stopStreaming();
+          break;
+
+        case 'getModels':
           await this._getModels();
           break;
-        
-        case "onModelChange":
+
+        case 'changeModel':
           vscode.window.showInformationMessage('Selected model: ' + model);
           this._context.globalState.update('model', model);
           break;
 
-        case "getLatestResponse":
+        case 'getSeanses':
           this._view?.webview.postMessage({
-            command: "ollamaResponse",
-            text: this._lastResponse,
+            command: 'getSeanses',
+            text: JSON.stringify(Array.from(this._seanses.values())),
           });
           break;
 
-        case "clearInput":
-          this._lastResponse = '';
+        case 'clearOutput':
+          this._seanses.clear();
           break;
       }
     });
   }
 
-  public addOutput = (text: string) => {
-    if (this._view) {
-      this._view.webview.postMessage({ 
-        command: 'addOutput',
-        text,
-      });
-    }
-  };
-  
-
   public generate = async (prompt: string) => {
+    if (!prompt) {
+      vscode.window.showWarningMessage('Prompt is not found!');
+      return;
+    }
+
+    if (!this._view) {
+      vscode.window.showWarningMessage('View is not found!');
+      return;
+    }
+
     const model: string | undefined = this._context.globalState.get('model');
 
-    if (this._view && model) {
-        this._lastResponse = prompt + getLineBreak();
-
-      return api.generate({
-        prompt,
-        model,
-        callback: this._generateResponse,
-      });
+    if (!model) {
+      vscode.window.showWarningMessage('Model is not selected!');
+      return;
     }
 
-    vscode.window.showWarningMessage('Model is not selected!');
+    this._streaming = await api.generate({
+      prompt,
+      model,
+      callback: this._generateResponse,
+    });
   };
 
-  private _generateResponse = (text: string) => {
-    this._lastResponse += text;
+  private _generateResponse = ({
+    prompt,
+    text,
+    streamId,
+  }: {
+    prompt: string;
+    text: string;
+    streamId: number;
+  }) => {
+    const seanse = this._seanses.get(streamId) || {
+      prompt,
+      response: '',
+    };
+
+    const newSeanse = {
+      prompt: seanse.prompt,
+      response: seanse.response + text,
+      streamId: streamId.toString(),
+    };
+
+    this._seanses.set(streamId, newSeanse);
 
     if (this._view) {
       this._view.webview.postMessage({
-        command: "ollamaResponse",
-        text,
+        command: 'getSeanse',
+        text: JSON.stringify(newSeanse),
       });
+    }
+  };
+
+  private _stopStreaming = () => {
+    if (this._streaming) {
+      this._streaming.stop();
     }
   };
 
@@ -99,10 +135,12 @@ class ViewProvider implements vscode.WebviewViewProvider {
       const text = await api.getModels();
 
       this._view.webview.postMessage({
-        command: "ollamaModels",
+        command: 'ollamaModels',
         text,
         selectedModel: model,
       });
+
+      vscode.window.showInformationMessage('Models list updated!');
     }
   };
 }

@@ -52,12 +52,21 @@ export const getContent = () => {
           background: var(--cursor-bg);
           color: var(--cursor-text);
         }
+
+        .prompt {
+          background: var(--cursor-bg);
+          color: var(--cursor-text);
+          padding: 10px;
+          border-radius: 4px;
+          border: 1px solid var(--cursor-border);
+        }
+
         #outputPanel {
           position: absolute;
           top: 50px;
           left: 10px;
           right: 10px;
-          height: calc(100% - 205px);
+          height: calc(100% - 195px);
         }
         #output {
           background: var(--cursor-bg);
@@ -145,7 +154,7 @@ export const getContent = () => {
           text-decoration: underline;
         }
         button {
-          height: 25px;
+          height: 20px;
           padding: 0 10px;
           border: 1px solid var(--cursor-border);
           outline: none;
@@ -154,7 +163,7 @@ export const getContent = () => {
           border-radius: 4px;
           cursor: pointer;
           margin-right: 5px;
-          font-size: 12px;
+          font-size: 10px;
           transition: background-color 0.2s;
         }
         button:hover {
@@ -236,8 +245,8 @@ export const getContent = () => {
           border: 1px solid var(--cursor-dropdown-border);
           border-radius: 4px;
           padding: 4px 8px;
-          font-size: 12px;
-          height: 25px;
+          font-size: 10px;
+          height: 20px;
           cursor: pointer;
           outline: none;
           appearance: none;
@@ -254,7 +263,7 @@ export const getContent = () => {
           top: 50%;
           transform: translateY(-50%);
           color: var(--cursor-text);
-          font-size: 10px;
+          font-size: 8px;
           pointer-events: none;
         }
 
@@ -277,7 +286,7 @@ export const getContent = () => {
       </style>
     </head>
     <body>
-      <h1>Ollama Interface</h1>
+      <h1>Chat</h1>
 
       <div id="outputPanel">
         <div id="output" class="scroll"></div>
@@ -289,12 +298,14 @@ export const getContent = () => {
 
         <div class="form-controls">
           <div class="button-group">
-            <button onclick="onCallOllama()">Run</button>
+            <button onclick="onRunStreaming()">Send</button>
+            <button onclick="onStopStreaming()">Stop</button>
             <button onclick="onClearInput()">Clear</button>
           </div>
 
           <div class="model-selector">
-            <select id="modelSelect" onchange="onModelChange()"></select>
+            <button onclick="onCheckModels()">Check models</button>
+            <select id="modelSelect" onchange="onChangeModel()"></select>
           </div>
         </div>
       </div>
@@ -308,8 +319,6 @@ export const getContent = () => {
             input: document.getElementById('input'),
             modelSelect: document.getElementById('modelSelect')
           };
-          
-          let mdText = '';
 
           // Настройка marked для лучшего отображения
           marked.setOptions({
@@ -339,18 +348,43 @@ export const getContent = () => {
           }
 
           // Функция для обновления вывода
-          function updateOutput(text, isPrompt = false) {
+          function updateOutput({
+            prompt,
+            response,
+            streamId,
+          }) {
             if (!elements.output) return;
-            
-            if (isPrompt) {
-              mdText = text + '<br>';
-            } else {
-              mdText += text;
+
+            let seanse = document.getElementById(streamId);
+
+            if (seanse) {
+              seanse.remove();
             }
-            
-            elements.output.innerHTML = marked.parse(mdText);
+
+            seanse = document.createElement('div');
+            seanse.id = streamId;
+
+            const p = document.createElement('p');
+            p.className = 'prompt';
+            p.textContent = prompt;
+            seanse.appendChild(p);
+
+            seanse.appendChild(document.createElement('br'));
+
+            const div = document.createElement('div');
+            div.innerHTML = marked.parse(response);
+            seanse.appendChild(div);
+
+            elements.output.appendChild(seanse);
+
             elements.output.scrollTop = elements.output.scrollHeight;
             applySyntaxHighlighting();
+          }
+
+          function addSeanses(seanses) {
+            seanses.forEach((seanse) => {
+              updateOutput(seanse);
+            });
           }
 
           function updateModels(text, selectedModel) {
@@ -373,7 +407,7 @@ export const getContent = () => {
               } else if (models.length > 0) {
                 elements.modelSelect.value = models[0];
 
-                onModelChange();
+                changeModel();
               }
             } catch (e) {
               console.error('Error parsing models:', e);
@@ -385,10 +419,9 @@ export const getContent = () => {
             if (!elements.output) return;
             
             elements.output.innerHTML = '';
-            mdText = '';
 
             vscode.postMessage({
-              command: 'clearInput',
+              command: 'clearOutput',
             });
           }
 
@@ -400,7 +433,7 @@ export const getContent = () => {
           }
 
           // Функция для отправки запроса
-          function sendRequest() {
+          function runStreaming() {
             if (!elements.input) return;
             
             const prompt = elements.input.value.trim();
@@ -409,24 +442,34 @@ export const getContent = () => {
 
             try {
               vscode.postMessage({
-                command: 'onCallOllama',
+                command: 'runStreaming',
                 prompt: prompt,
               });
 
-              // Показываем введенный текст в выводе
-              updateOutput(prompt, true);
               clearInput();
             } catch (e) {
               console.error('Post message error:', e);
             }
           }
 
+          function stopStreaming() {
+            vscode.postMessage({
+              command: 'stopStreaming',
+            });
+          }
+
+          function checkModels() {
+            vscode.postMessage({
+              command: 'getModels',
+            });
+          }
+
           // Обработчик изменения модели
-          function onModelChange() {
+          function changeModel() {
             if (!elements.modelSelect) return;
 
             vscode.postMessage({
-              command: 'onModelChange',
+              command: 'changeModel',
               model: elements.modelSelect.value
             });
           }
@@ -438,12 +481,12 @@ export const getContent = () => {
                 updateModels(text, selectedModel);
                 break;
 
-              case 'ollamaResponse':
-                updateOutput(text);
+              case 'getSeanses':
+                addSeanses(JSON.parse(text));
                 break;
 
-              case 'addOutput':
-                updateOutput(text, true);
+              case 'getSeanse':
+                updateOutput(JSON.parse(text));
                 break;
             }
           });
@@ -452,15 +495,17 @@ export const getContent = () => {
           window.onUpdateOutput = updateOutput;
           window.onClearOutput = clearOutput;
           window.onClearInput = clearInput;
-          window.onCallOllama = sendRequest;
-          window.onModelChange = onModelChange;
+          window.onRunStreaming = runStreaming;
+          window.onStopStreaming = stopStreaming;
+          window.onCheckModels = checkModels;
+          window.onChangeModel = changeModel;
 
           // Добавляем обработчик клавиш для textarea
           if (elements.input) {
             elements.input.addEventListener('keydown', (e) => {
               if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
                 e.preventDefault();
-                sendRequest();
+                runStreaming();
               }
             });
           }
@@ -471,7 +516,7 @@ export const getContent = () => {
             });
 
             vscode.postMessage({
-              command: 'getLatestResponse',
+              command: 'getSeanses',
             });
           } catch (e) {
             console.error('Post message error:', e);

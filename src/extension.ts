@@ -1,19 +1,19 @@
-import * as vscode from "vscode";
-import ViewProvider from "./ui/ViewProvider";
+import * as vscode from 'vscode';
+import ViewProvider from './ui/ViewProvider';
 
 export function activate(context: vscode.ExtensionContext) {
   // Регистрация провайдера для Side Bar
   const provider = new ViewProvider(context);
-  
+
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider('ai-assistant-view', provider)
   );
 
   // Регистрация команды для кнопки в панели быстрого доступа
   context.subscriptions.push(
-    vscode.commands.registerCommand("askAi", async () => {
+    vscode.commands.registerCommand('askAi', async () => {
       const editor = vscode.window.activeTextEditor;
-      let prompt = "";
+      let prompt = '';
 
       if (editor) {
         prompt = editor.document.getText(editor.selection);
@@ -21,12 +21,11 @@ export function activate(context: vscode.ExtensionContext) {
 
       // Показываем view в сайдбаре
       await vscode.commands.executeCommand('workbench.view.extension.ai-assistant-sidebar');
-      provider.addOutput(prompt);
       await provider.generate(prompt);
     })
   );
 }
 
 export function deactivate() {
-  console.log("Extension deactivated!");
+  console.log('Extension deactivated!');
 }

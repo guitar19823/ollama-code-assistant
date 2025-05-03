@@ -53,6 +53,14 @@
           "when": "view == ai-assistant-view",
           "group": "navigation"
         }
+      ],
+      "view/toolbar": [
+        {
+          "command": "askAi",
+          "when": "view == ai-assistant-view",
+          "group": "navigation",
+          "icon": "icons/three-neurons.svg"
+        }
       ]
     },
     "viewsContainers": {
@@ -60,6 +68,13 @@
         {
           "id": "ai-assistant-sidebar",
           "title": "AI Assistant",
+          "icon": "icons/three-neurons.svg"
+        }
+      ],
+      "title": [
+        {
+          "id": "ai-assistant-view",
+          "name": "AI Assistant",
           "icon": "icons/three-neurons.svg"
         }
       ]
@@ -71,14 +86,16 @@
           "name": "AI Assistant",
           "type": "webview"
         }
+      ],
+      "explorer": [
+        {
+          "id": "ai-assistant-view",
+          "name": "AI Assistant",
+          "type": "webview",
+          "icon": "icons/three-neurons.svg"
+        }
       ]
-    },
-    "webviews": [
-      {
-        "id": "my-ai-plugin",
-        "title": "AI Results"
-      }
-    ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run package-extension",
@@ -87,6 +104,7 @@
     "watch": "webpack --mode development --watch",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\"",
     "test": "vscode-test",
     "package": "vsce package",
     "publish": "vsce publish"
@@ -100,10 +118,10 @@
     "@vscode/test-cli": "^0.0.10",
     "@vscode/test-electron": "^2.4.1",
     "eslint": "^9.23.0",
+    "prettier": "^3.2.5",
     "ts-loader": "^9.5.2",
     "typescript": "^5.8.2",
     "webpack": "^5.99.7",
     "webpack-cli": "^6.0.1"
-  },
-  "icon": "icons/three-neurons.png"
+  }
 }
