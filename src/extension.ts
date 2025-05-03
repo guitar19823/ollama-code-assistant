@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import ViewProvider from './ui/ViewProvider';
+import ViewProvider from './model/ViewProvider';
 
 export function activate(context: vscode.ExtensionContext) {
   // Регистрация провайдера для Side Bar

@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
-import * as api from '../model/api';
-import { getContent } from './getContent';
+import * as api from '../api';
+import { html } from '../ui/html';
 
 class ViewProvider implements vscode.WebviewViewProvider {
   private _view?: vscode.WebviewView;
@@ -32,7 +32,7 @@ class ViewProvider implements vscode.WebviewViewProvider {
       localResourceRoots: [this._context.extensionUri],
     };
 
-    this._view.webview.html = getContent();
+    this._view.webview.html = html;
 
     this._view.webview.onDidReceiveMessage(async ({ command, prompt, model }: any) => {
       switch (command) {
