@@ -3,9 +3,12 @@ export const script = `
     const vscode = acquireVsCodeApi();
 
     const elements = {
+      settingsDialog: document.getElementById('settingsDialog'),
+      baseUrlInput: document.getElementById('baseUrl'),
       output: document.getElementById('output'),
       input: document.getElementById('input'),
-      modelSelect: document.getElementById('modelSelect')
+      modelSelect: document.getElementById('modelSelect'),
+      loadingIndicator: document.getElementById('loadingIndicator')
     };
 
     // Настройка marked для лучшего отображения
@@ -162,6 +165,52 @@ export const script = `
       });
     }
 
+    function showLoading() {
+      if (elements.loadingIndicator) {
+        elements.loadingIndicator.classList.add('active');
+      }
+    }
+
+    function hideLoading() {
+      if (elements.loadingIndicator) {
+        elements.loadingIndicator.classList.remove('active');
+      }
+    }
+
+    function toggleMenu() {
+      const dropdown = document.querySelector('.menu-dropdown');
+
+      if (dropdown) {
+        dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+      }
+    }
+
+    function showSettings() {
+      if (elements.settingsDialog) {
+        elements.settingsDialog.classList.add('active');
+      }
+    }
+
+    function hideSettings() {
+      if (elements.settingsDialog) {
+        elements.settingsDialog.classList.remove('active');
+      }
+    }
+
+    function saveSettings() {
+      if (!elements.baseUrlInput) return;
+      
+      const baseUrl = elements.baseUrlInput.value.trim();
+      const sanitizedUrl = baseUrl.replace(/<[^>]*>/g, ''); // Remove any HTML tags
+      
+      vscode.postMessage({
+        command: 'saveSettings',
+        baseUrl: sanitizedUrl
+      });
+      
+      hideSettings();
+    }
+
     // Обработчик сообщений от VS Code
     window.addEventListener('message', ({ data: { command, text, selectedModel } }) => {
       switch (command) {
@@ -176,10 +225,22 @@ export const script = `
         case 'getSeanse':
           updateOutput(JSON.parse(text));
           break;
+          
+        case 'startSreaming':
+          showLoading();
+          break;
+
+        case 'finishStreaming':
+          hideLoading();
+          break;
       }
     });
 
     // Экспортируем функции для использования в HTML
+    window.toggleMenu = toggleMenu;
+    window.showSettings = showSettings;
+    window.hideSettings = hideSettings;
+    window.saveSettings = saveSettings;
     window.onUpdateOutput = updateOutput;
     window.onClearOutput = clearOutput;
     window.onClearInput = clearInput;
@@ -187,6 +248,8 @@ export const script = `
     window.onStopStreaming = stopStreaming;
     window.onCheckModels = checkModels;
     window.onChangeModel = changeModel;
+    window.showLoading = showLoading;
+    window.hideLoading = hideLoading;
 
     // Добавляем обработчик клавиш для textarea
     if (elements.input) {

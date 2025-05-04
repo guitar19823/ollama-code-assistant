@@ -13,13 +13,7 @@ export const getModels = async () => {
 
     const data: any = await response.json();
 
-    const models = data?.models.map((model: any) => model.name);
-
-    if (models.length === 0) {
-      vscode.window.showWarningMessage('No models found');
-    }
-
-    return JSON.stringify(data?.models.map((model: any) => model.name));
+    return data?.models.map((model: any) => model.name);
   } catch (error: unknown) {
     showError(error);
   }

@@ -41,7 +41,7 @@ class ViewProvider implements vscode.WebviewViewProvider {
           break;
 
         case 'stopStreaming':
-          this._stopStreaming();
+          this._streaming?.stop();
           break;
 
         case 'getModels':
@@ -88,7 +88,17 @@ class ViewProvider implements vscode.WebviewViewProvider {
     this._streaming = await api.generate({
       prompt,
       model,
-      callback: this._generateResponse,
+      onStartStreaming: () => {
+        this._view?.webview.postMessage({
+          command: 'startStreaming',
+        });
+      },
+      onFinishStreaming: () => {
+        this._view?.webview.postMessage({
+          command: 'finishStreaming',
+        });
+      },
+      onUpdateOutput: this._generateResponse,
     });
   };
 
@@ -114,32 +124,28 @@ class ViewProvider implements vscode.WebviewViewProvider {
 
     this._seanses.set(streamId, newSeanse);
 
-    if (this._view) {
-      this._view.webview.postMessage({
-        command: 'getSeanse',
-        text: JSON.stringify(newSeanse),
-      });
-    }
-  };
-
-  private _stopStreaming = () => {
-    if (this._streaming) {
-      this._streaming.stop();
-    }
+    this._view?.webview.postMessage({
+      command: 'getSeanse',
+      text: JSON.stringify(newSeanse),
+    });
   };
 
   private _getModels = async () => {
-    const model: string | undefined = this._context.globalState.get('model');
+    if (!this._view) {
+      return;
+    }
 
-    if (this._view) {
-      const text = await api.getModels();
+    const models = await api.getModels();
 
-      this._view.webview.postMessage({
-        command: 'ollamaModels',
-        text,
-        selectedModel: model,
-      });
+    this._view.webview.postMessage({
+      command: 'ollamaModels',
+      text: JSON.stringify(models),
+      selectedModel: this._context.globalState.get('model'),
+    });
 
+    if (models.length === 0) {
+      vscode.window.showWarningMessage('No models found');
+    } else {
       vscode.window.showInformationMessage('Models list updated!');
     }
   };
