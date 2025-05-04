@@ -110,6 +110,11 @@ class ViewProvider implements vscode.WebviewViewProvider {
       baseUrl,
       prompt,
       model,
+      onLoading: () => {
+        this._view?.webview.postMessage({
+          command: 'loading',
+        });
+      },
       onStartStreaming: () => {
         this._view?.webview.postMessage({
           command: 'startStreaming',

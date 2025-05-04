@@ -53,7 +53,16 @@ export const html = `
 
         <div class="button-group space-between">
           <button onclick="onClearOutput()">Clear</button>
-          <div id="loadingIndicator" class="loading-indicator"></div>
+          
+          <div>
+            <div id="loadingIndicator" class="loading-indicator"></div>
+
+            <div id="typingIndicator" class="typing-indicator">
+              <span class="dot">.</span>
+              <span class="dot">.</span>
+              <span class="dot">.</span>
+            </div>
+          </div>
         </div>
       </div>
 

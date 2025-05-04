@@ -6,6 +6,7 @@ interface IParam {
   baseUrl: string;
   prompt: string;
   model: string;
+  onLoading: () => void;
   onStartStreaming: () => void;
   onFinishStreaming: () => void;
   onUpdateOutput: (params: { prompt: string; text: string; streamId: number }) => void;
@@ -18,6 +19,7 @@ const startStreaming = async ({
   baseUrl,
   prompt,
   model,
+  onLoading,
   onStartStreaming,
   onFinishStreaming,
   onUpdateOutput,
@@ -27,10 +29,17 @@ const startStreaming = async ({
     return;
   }
 
+  const streamId = new Date().getTime();
   controller = new AbortController();
   isStreaming = true;
 
-  onStartStreaming();
+  onLoading();
+
+  onUpdateOutput({
+    prompt,
+    text: '',
+    streamId,
+  });
 
   try {
     const response = await fetch(getGenerateUrl(baseUrl), {
@@ -50,7 +59,8 @@ const startStreaming = async ({
 
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
-    const streamId = new Date().getTime();
+
+    onStartStreaming();
 
     while (true) {
       const { done, value } = await reader.read();

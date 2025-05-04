@@ -62,9 +62,8 @@ export const style = `
     margin-bottom: 10px;
     padding: 8px;
     white-space: pre-wrap;
-    min-height: 50px;
     font-size: 14px;
-    max-height: calc(100% - 35px);
+    height: calc(100% - 35px);
     overflow: hidden;
     overflow-y: scroll;
     border-radius: 4px;
@@ -291,6 +290,59 @@ export const style = `
   @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+  }
+
+  .typing-indicator {
+    height: 20px;
+    margin: 0 2px 0 8px;
+    padding-bottom: 6px;
+    display: none;
+  }
+
+  .typing-indicator.active {
+    display: block;
+  }
+
+  .typing-indicator .dot {
+    margin: 0 1px;
+    color: var(--cursor-text);
+    font-size: 14px;
+  }
+
+  .typing-indicator .dot:nth-child(1) {
+    animation: typing-indicator-animation-1 1.5s infinite;
+  }
+
+  .typing-indicator .dot:nth-child(2) {
+    animation: typing-indicator-animation-2 1.5s infinite;
+  }
+
+  .typing-indicator .dot:nth-child(3) {
+    animation: typing-indicator-animation-3  1.5s infinite;
+  }
+
+  @keyframes typing-indicator-animation-1 {
+    0% { opacity: 0; }
+    25% { opacity: 0; }
+    50% { opacity: 1; }
+    75% { opacity: 1; }
+    100% { opacity: 1; }
+  }
+
+  @keyframes typing-indicator-animation-2 {
+    0% { opacity: 0; }
+    25% { opacity: 0; }
+    50% { opacity: 0; }
+    75% { opacity: 1; }
+    100% { opacity: 1; }
+  }
+
+  @keyframes typing-indicator-animation-3 {
+    0% { opacity: 0; }
+    25% { opacity: 0; }
+    50% { opacity: 0; }
+    75% { opacity: 0; }
+    100% { opacity: 1; }
   }
 
   .form-controls {

@@ -8,7 +8,8 @@ export const script = `
       output: document.getElementById('output'),
       input: document.getElementById('input'),
       modelSelect: document.getElementById('modelSelect'),
-      loadingIndicator: document.getElementById('loadingIndicator')
+      loadingIndicator: document.getElementById('loadingIndicator'),
+      typingIndicator: document.getElementById('typingIndicator')
     };
 
     // Настройка marked для лучшего отображения
@@ -165,17 +166,30 @@ export const script = `
       });
     }
 
-    function showLoading() {
+    function showLoadingIndicator() {
       if (elements.loadingIndicator) {
         elements.loadingIndicator.classList.add('active');
       }
     }
 
-    function hideLoading() {
+    function hideLoadingIndicator() {
       if (elements.loadingIndicator) {
         elements.loadingIndicator.classList.remove('active');
       }
     }
+
+    function showTypingIndicator() {
+      if (elements.typingIndicator) {
+        elements.typingIndicator.classList.add('active');
+      }
+    }
+
+    function hideTypingIndicator() {
+      if (elements.typingIndicator) {
+        elements.typingIndicator.classList.remove('active');
+      }
+    }
+    
 
     function showSettings() {
       if (elements.settingsDialog) {
@@ -227,13 +241,18 @@ export const script = `
         case 'setSettings':
           setSettings(JSON.parse(text));
           break;
-          
+
+        case 'loading':
+          showLoadingIndicator();
+          break;
+
         case 'startStreaming':
-          showLoading();
+          hideLoadingIndicator();
+          showTypingIndicator();
           break;
 
         case 'finishStreaming':
-          hideLoading();
+          hideTypingIndicator();
           break;
       }
     });
@@ -249,8 +268,10 @@ export const script = `
     window.onStopStreaming = stopStreaming;
     window.onCheckModels = checkModels;
     window.onChangeModel = changeModel;
-    window.showLoading = showLoading;
-    window.hideLoading = hideLoading;
+    window.showLoadingIndicator = showLoadingIndicator;
+    window.hideLoadingIndicator = hideLoadingIndicator;
+    window.showTypingIndicator = showTypingIndicator;
+    window.hideTypingIndicator = hideTypingIndicator;
 
     // Добавляем обработчик клавиш для textarea
     if (elements.input) {
