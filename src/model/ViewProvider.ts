@@ -34,18 +34,29 @@ class ViewProvider implements vscode.WebviewViewProvider {
 
     this._view.webview.html = html;
 
-    this._view.webview.onDidReceiveMessage(async ({ command, prompt, model }: any) => {
+    this._view.webview.onDidReceiveMessage(async ({ baseUrl, command, prompt, model }: any) => {
       switch (command) {
         case 'runStreaming':
           await this.generate(prompt);
           break;
 
         case 'stopStreaming':
-          this._stopStreaming();
+          this._streaming?.stop();
           break;
 
         case 'getModels':
           await this._getModels();
+          break;
+
+        case 'getSettings':
+          vscode.window.showInformationMessage('Settings: ' + this._context.globalState.get('baseUrl'));
+          this._view?.webview.postMessage({
+            command: 'setSettings',
+            text: JSON.stringify({
+              baseUrl: this._context.globalState.get('baseUrl'),
+              model: this._context.globalState.get('model'),
+            }),
+          });
           break;
 
         case 'changeModel':
@@ -55,7 +66,7 @@ class ViewProvider implements vscode.WebviewViewProvider {
 
         case 'getSeanses':
           this._view?.webview.postMessage({
-            command: 'getSeanses',
+            command: 'setSeanses',
             text: JSON.stringify(Array.from(this._seanses.values())),
           });
           break;
@@ -63,6 +74,9 @@ class ViewProvider implements vscode.WebviewViewProvider {
         case 'clearOutput':
           this._seanses.clear();
           break;
+
+        case 'saveSettings':
+          this._context.globalState.update('baseUrl', baseUrl);
       }
     });
   }
@@ -78,6 +92,13 @@ class ViewProvider implements vscode.WebviewViewProvider {
       return;
     }
 
+    const baseUrl: string | undefined = this._context.globalState.get('baseUrl');
+
+    if (!baseUrl) {
+      vscode.window.showWarningMessage('Base URL is not found!');
+      return;
+    }
+
     const model: string | undefined = this._context.globalState.get('model');
 
     if (!model) {
@@ -86,9 +107,20 @@ class ViewProvider implements vscode.WebviewViewProvider {
     }
 
     this._streaming = await api.generate({
+      baseUrl,
       prompt,
       model,
-      callback: this._generateResponse,
+      onStartStreaming: () => {
+        this._view?.webview.postMessage({
+          command: 'startStreaming',
+        });
+      },
+      onFinishStreaming: () => {
+        this._view?.webview.postMessage({
+          command: 'finishStreaming',
+        });
+      },
+      onUpdateOutput: this._generateResponse,
     });
   };
 
@@ -114,32 +146,35 @@ class ViewProvider implements vscode.WebviewViewProvider {
 
     this._seanses.set(streamId, newSeanse);
 
-    if (this._view) {
-      this._view.webview.postMessage({
-        command: 'getSeanse',
-        text: JSON.stringify(newSeanse),
-      });
-    }
-  };
-
-  private _stopStreaming = () => {
-    if (this._streaming) {
-      this._streaming.stop();
-    }
+    this._view?.webview.postMessage({
+      command: 'setSeanse',
+      text: JSON.stringify(newSeanse),
+    });
   };
 
   private _getModels = async () => {
-    const model: string | undefined = this._context.globalState.get('model');
+    if (!this._view) {
+      return;
+    }
 
-    if (this._view) {
-      const text = await api.getModels();
+    const baseUrl: string | undefined = this._context.globalState.get('baseUrl');
 
-      this._view.webview.postMessage({
-        command: 'ollamaModels',
-        text,
-        selectedModel: model,
-      });
+    if (!baseUrl) {
+      vscode.window.showWarningMessage('Base URL is not found!');
+      return;
+    }
 
+    const models = await api.getModels(baseUrl);
+
+    this._view.webview.postMessage({
+      command: 'ollamaModels',
+      text: JSON.stringify(models),
+      selectedModel: this._context.globalState.get('model'),
+    });
+
+    if (models.length === 0) {
+      vscode.window.showWarningMessage('No models found');
+    } else {
       vscode.window.showInformationMessage('Models list updated!');
     }
   };

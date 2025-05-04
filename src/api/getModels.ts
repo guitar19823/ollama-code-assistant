@@ -1,10 +1,9 @@
-import * as vscode from 'vscode';
 import { getTagsUrl } from './getUrl';
 import { showError } from '../lib/showError';
 
-export const getModels = async () => {
+export const getModels = async (baseUrl: string) => {
   try {
-    const response = await fetch(getTagsUrl(), {
+    const response = await fetch(getTagsUrl(baseUrl), {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -13,13 +12,7 @@ export const getModels = async () => {
 
     const data: any = await response.json();
 
-    const models = data?.models.map((model: any) => model.name);
-
-    if (models.length === 0) {
-      vscode.window.showWarningMessage('No models found');
-    }
-
-    return JSON.stringify(data?.models.map((model: any) => model.name));
+    return data?.models.map((model: any) => model.name);
   } catch (error: unknown) {
     showError(error);
   }

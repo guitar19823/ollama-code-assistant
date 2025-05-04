@@ -52,10 +52,10 @@ export const style = `
 
   #outputPanel {
     position: absolute;
-    top: 50px;
+    top: 35px;
     left: 10px;
     right: 10px;
-    height: calc(100% - 195px);
+    height: calc(100% - 180px);
   }
   #output {
     background: var(--cursor-bg);
@@ -266,6 +266,31 @@ export const style = `
 
   .button-group {
     display: flex;
+    align-items: center;
+  }
+
+  .space-between {
+    justify-content: space-between;
+  }
+
+  .loading-indicator {
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--cursor-border);
+    border-top: 2px solid var(--cursor-link);
+    border-radius: 50%;
+    margin-left: 8px;
+    display: none;
+    animation: spin 1s linear infinite;
+  }
+
+  .loading-indicator.active {
+    display: block;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
   }
 
   .form-controls {

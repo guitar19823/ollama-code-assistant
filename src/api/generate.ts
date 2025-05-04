@@ -3,15 +3,25 @@ import { getGenerateUrl } from './getUrl';
 import { showError } from '../lib/showError';
 
 interface IParam {
+  baseUrl: string;
   prompt: string;
   model: string;
-  callback: (params: { prompt: string; text: string; streamId: number }) => void;
+  onStartStreaming: () => void;
+  onFinishStreaming: () => void;
+  onUpdateOutput: (params: { prompt: string; text: string; streamId: number }) => void;
 }
 
 let controller: AbortController | null = null;
 let isStreaming = false;
 
-const startStreaming = async ({ prompt, model, callback }: IParam) => {
+const startStreaming = async ({
+  baseUrl,
+  prompt,
+  model,
+  onStartStreaming,
+  onFinishStreaming,
+  onUpdateOutput,
+}: IParam) => {
   if (isStreaming) {
     vscode.window.showWarningMessage('Streaming is already in progress');
     return;
@@ -20,8 +30,10 @@ const startStreaming = async ({ prompt, model, callback }: IParam) => {
   controller = new AbortController();
   isStreaming = true;
 
+  onStartStreaming();
+
   try {
-    const response = await fetch(getGenerateUrl(), {
+    const response = await fetch(getGenerateUrl(baseUrl), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -51,7 +63,7 @@ const startStreaming = async ({ prompt, model, callback }: IParam) => {
       const lines = chunk.split('\n').filter(line => line.trim());
 
       for (const line of lines) {
-        callback({
+        onUpdateOutput({
           prompt,
           text: JSON.parse(line).response,
           streamId,
@@ -63,6 +75,8 @@ const startStreaming = async ({ prompt, model, callback }: IParam) => {
   } finally {
     isStreaming = false;
     controller = null;
+
+    onFinishStreaming();
   }
 };
 
