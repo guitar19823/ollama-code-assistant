@@ -2,7 +2,7 @@
   "name": "ollama-code-assistant",
   "displayName": "Ollama Code Assistant",
   "description": "A powerful AI code assistant for VS Code that integrates with Ollama to provide intelligent code assistance and natural language processing capabilities.",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "publisher": "Alexey",
   "engines": {
     "vscode": "^1.99.0"
