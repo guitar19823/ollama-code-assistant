@@ -61,7 +61,7 @@ export const headerStyle = `
     background: var(--cursor-bg);
     border: 1px solid var(--cursor-border);
     border-radius: 4px;
-    padding: 20px 10px 10px 10px;
+    padding: 30px 10px 10px 10px;
     width: 400px;
     position: relative;
   }
@@ -95,28 +95,87 @@ export const headerStyle = `
     flex-direction: column;
   }
 
-  .settings-form label {
-    color: var(--cursor-text);
-    font-size: 12px;
-    margin-bottom: 5px;
-  }
-
-  .settings-form input {
-    background: var(--cursor-input-bg);
-    border: 1px solid var(--cursor-input-border);
-    border-radius: 4px;
-    padding: 6px 8px;
-    margin-bottom: 10px;
-    color: var(--cursor-text);
-    font-size: 12px;
-  }
-
   .settings-form input:focus {
     border-color: var(--cursor-input-focus);
     outline: none;
   }
 
-  .settings-form button {
+  .settings-form button,
+  .rule-edit-form button {
+    background-color: var(--vscode-button-background);
     width: 100%;
+  }
+
+  .settings-form button:hover,
+  .rule-edit-form button:hover {
+    background-color: var(--vscode-button-hoverBackground);
+  }
+  
+  #rulesContainer {
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 50px;
+    max-height: 200px;
+    padding: 5px 0;
+    margin-bottom: 5px;
+    border-top: 1px solid var(--cursor-border);
+    border-bottom: 1px solid var(--cursor-border);
+  }
+
+  .rule-item {
+    padding: 4px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid transparent;
+    border-radius: 4px;
+  }
+
+  .rule-item:hover {
+    border: 1px solid var(--cursor-border);
+  }
+
+  .rule-item button {
+    margin-left: 5px;
+    margin-right: 0;
+  }
+
+  .rule-item button:hover {
+    background-color: var(--vscode-button-hoverBackground);
+  }
+
+  .add-rule-button {
+    margin-top: 5px;
+    background-color: var(--vscode-button-background);
+  }
+
+  .add-rule-button:hover {
+    background-color: var(--vscode-button-hoverBackground);
+  }
+
+  .rule-edit-form label {
+    color: var(--cursor-text);
+    font-size: 10px;
+    margin-bottom: 5px;
+  }
+
+  .rule-edit-form {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .rule-edit-form textarea {
+    min-height: 200px;
+    resize: none;
+  }
+  
+  .rule-edit-form button {
+    background-color: var(--vscode-button-background);
+    width: 100%;
+  }
+
+  .rule-edit-form button:hover {
+    background-color: var(--vscode-button-hoverBackground);
   }
 `;

@@ -34,51 +34,67 @@ class ViewProvider implements vscode.WebviewViewProvider {
 
     this._view.webview.html = html;
 
-    this._view.webview.onDidReceiveMessage(async ({ baseUrl, command, prompt, model }: any) => {
-      switch (command) {
-        case 'runStreaming':
-          await this.generate(prompt);
-          break;
+    this._view.webview.onDidReceiveMessage(
+      async ({ baseUrl, command, prompt, model, rules }: any) => {
+        switch (command) {
+          case 'runStreaming':
+            await this.generate(prompt);
+            break;
 
-        case 'stopStreaming':
-          this._streaming?.stop();
-          break;
+          case 'stopStreaming':
+            this._streaming?.stop();
+            break;
 
-        case 'getModels':
-          await this._getModels();
-          break;
+          case 'getModels':
+            await this._getModels();
+            break;
 
-        case 'getSettings':
-          vscode.window.showInformationMessage('Settings: ' + this._context.globalState.get('baseUrl'));
-          this._view?.webview.postMessage({
-            command: 'setSettings',
-            text: JSON.stringify({
-              baseUrl: this._context.globalState.get('baseUrl'),
-              model: this._context.globalState.get('model'),
-            }),
-          });
-          break;
+          case 'getSettings':
+            vscode.window.showInformationMessage(
+              'Settings: ' + this._context.workspaceState.get('baseUrl')
+            );
+            this._view?.webview.postMessage({
+              command: 'setSettings',
+              text: JSON.stringify({
+                baseUrl: this._context.workspaceState.get('baseUrl'),
+                model: this._context.workspaceState.get('model'),
+              }),
+            });
+            break;
 
-        case 'changeModel':
-          vscode.window.showInformationMessage('Selected model: ' + model);
-          this._context.globalState.update('model', model);
-          break;
+          case 'changeModel':
+            vscode.window.showInformationMessage('Selected model: ' + model);
+            this._context.workspaceState.update('model', model);
+            break;
 
-        case 'getSeanses':
-          this._view?.webview.postMessage({
-            command: 'setSeanses',
-            text: JSON.stringify(Array.from(this._seanses.values())),
-          });
-          break;
+          case 'getSeanses':
+            this._view?.webview.postMessage({
+              command: 'setSeanses',
+              text: JSON.stringify(Array.from(this._seanses.values())),
+            });
+            break;
 
-        case 'clearOutput':
-          this._seanses.clear();
-          break;
+          case 'clearOutput':
+            this._seanses.clear();
+            break;
 
-        case 'saveSettings':
-          this._context.globalState.update('baseUrl', baseUrl);
+          case 'saveSettings':
+            this._context.workspaceState.update('baseUrl', baseUrl);
+            break;
+
+          case 'saveRules':
+            this._context.workspaceState.update('rules', rules);
+            break;
+
+          case 'getRules':
+            this._view?.webview.postMessage({
+              command: 'setRules',
+              text: this._context.workspaceState.get('rules'),
+            });
+            break;
+        }
       }
-    });
+    );
   }
 
   public generate = async (prompt: string) => {
@@ -92,14 +108,14 @@ class ViewProvider implements vscode.WebviewViewProvider {
       return;
     }
 
-    const baseUrl: string | undefined = this._context.globalState.get('baseUrl');
+    const baseUrl: string | undefined = this._context.workspaceState.get('baseUrl');
 
     if (!baseUrl) {
       vscode.window.showWarningMessage('Base URL is not found!');
       return;
     }
 
-    const model: string | undefined = this._context.globalState.get('model');
+    const model: string | undefined = this._context.workspaceState.get('model');
 
     if (!model) {
       vscode.window.showWarningMessage('Model is not selected!');
@@ -110,6 +126,7 @@ class ViewProvider implements vscode.WebviewViewProvider {
       baseUrl,
       prompt,
       model,
+      rules: JSON.parse(this._context.workspaceState.get('rules') || '[]'),
       onLoading: () => {
         this._view?.webview.postMessage({
           command: 'loading',
@@ -162,7 +179,7 @@ class ViewProvider implements vscode.WebviewViewProvider {
       return;
     }
 
-    const baseUrl: string | undefined = this._context.globalState.get('baseUrl');
+    const baseUrl: string | undefined = this._context.workspaceState.get('baseUrl');
 
     if (!baseUrl) {
       vscode.window.showWarningMessage('Base URL is not found!');
@@ -174,7 +191,7 @@ class ViewProvider implements vscode.WebviewViewProvider {
     this._view.webview.postMessage({
       command: 'ollamaModels',
       text: JSON.stringify(models),
-      selectedModel: this._context.globalState.get('model'),
+      selectedModel: this._context.workspaceState.get('model'),
     });
 
     if (models.length === 0) {

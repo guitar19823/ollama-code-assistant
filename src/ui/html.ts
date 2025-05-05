@@ -1,6 +1,7 @@
-import { headerStyle } from './headerStyle';
+import { headerStyle } from './styles/headerStyle';
+import { highlight } from './styles/highlight';
 import { script } from './script';
-import { style } from './style';
+import { style } from './styles/style';
 
 export const html = `
   <!DOCTYPE html>
@@ -11,7 +12,7 @@ export const html = `
       <title>Ollama Webview</title>
       <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+      <style>${highlight}</style>
       <style>${style}</style>
       <style>${headerStyle}</style>
     </head>
@@ -32,6 +33,10 @@ export const html = `
             <div class="menu-item" onclick="showSettings()">
               <span>Base URL</span>
             </div>
+
+            <div class="menu-item" onclick="showRules()">
+              <span>Rules</span>
+            </div>
           </div>
         </div>
       </div>
@@ -41,9 +46,34 @@ export const html = `
           <button class="close-button" onclick="hideSettings()">×</button>
 
           <div class="settings-form">
-            <label for="baseUrl">Base URL</label>
-            <input type="text" id="baseUrl" placeholder="Enter the base URL. For example: http://localhost:11434">
+            <label class="label" for="baseUrl">Base URL</label>
+            <input class="input" type="text" id="baseUrl" placeholder="Enter the base URL. For example: http://localhost:11434">
             <button onclick="saveSettings()">Save</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="rulesDialog" class="settings-dialog">
+        <div class="settings-content">
+          <button class="close-button" onclick="hideRules()">×</button>
+
+          <div class="rules-list">
+            <div id="rulesContainer" class="scroll"></div>
+            <button class="add-rule-button" onclick="addNewRule()">Add Rule</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="ruleEditDialog" class="settings-dialog">
+        <div class="settings-content">
+          <button class="close-button" onclick="hideRuleEdit()">×</button>
+
+          <div class="rule-edit-form">
+            <label class="label" for="ruleName">Rule Name</label>
+            <input class="input" type="text" id="ruleName" placeholder="Enter rule name">
+            <label class="label" for="ruleContent">Rule Content</label>
+            <textarea class="textarea scroll" id="ruleContent" placeholder="Enter rule content" rows="10"></textarea>
+            <button onclick="saveRule()">Save</button>
           </div>
         </div>
       </div>
@@ -67,7 +97,7 @@ export const html = `
       </div>
 
       <div id="form">
-        <textarea class="scroll" id="input" autofocus placeholder="Enter your prompt" rows="10"></textarea>
+        <textarea class="textarea scroll" id="input" autofocus placeholder="Enter your prompt" rows="10"></textarea>
 
         <div class="form-controls">
           <div class="button-group">
@@ -76,7 +106,19 @@ export const html = `
             <button onclick="onClearInput()">Clear</button>
           </div>
 
-          <div class="model-selector">
+          <div class="button-group-right">
+            <div class="rules-selector-container">
+              <button id="rulesSelectorButton">Select Rules</button>
+
+              <div id="rulesSelector" class="rules-selector">
+                <div class="rules-selector-content">
+                  <div class="rules-list">
+                    <div id="rulesCheckboxContainer"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <button onclick="onCheckModels()">Check models</button>
             <select id="modelSelect" onchange="onChangeModel()"></select>
           </div>

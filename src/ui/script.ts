@@ -1,5 +1,5 @@
 export const script = `
-  (function() {
+  document.addEventListener('DOMContentLoaded', function() {
     const vscode = acquireVsCodeApi();
 
     const elements = {
@@ -9,8 +9,18 @@ export const script = `
       input: document.getElementById('input'),
       modelSelect: document.getElementById('modelSelect'),
       loadingIndicator: document.getElementById('loadingIndicator'),
-      typingIndicator: document.getElementById('typingIndicator')
+      typingIndicator: document.getElementById('typingIndicator'),
+      rulesDialog: document.getElementById('rulesDialog'),
+      ruleEditDialog: document.getElementById('ruleEditDialog'),
+      rulesContainer: document.getElementById('rulesContainer'),
+      rulesCheckboxContainer: document.getElementById('rulesCheckboxContainer'),
+      rulesSelector: document.getElementById('rulesSelector'),
+      ruleName: document.getElementById('ruleName'),
+      ruleContent: document.getElementById('ruleContent')
     };
+
+    let currentRuleId = null;
+    let rules = [];
 
     // Настройка marked для лучшего отображения
     marked.setOptions({
@@ -223,7 +233,167 @@ export const script = `
       elements.baseUrlInput.value = settings.baseUrl;
     }
 
-    // Обработчик сообщений от VS Code
+    function showRules() {
+      if (elements.rulesDialog) {
+        elements.rulesDialog.classList.add('active');
+        loadRules();
+      }
+    }
+
+    function hideRules() {
+      if (elements.rulesDialog) {
+        elements.rulesDialog.classList.remove('active');
+      }
+    }
+
+    function showRuleEdit(ruleId = null) {
+      currentRuleId = ruleId;
+
+      if (elements.ruleEditDialog) {
+        elements.ruleEditDialog.classList.add('active');
+
+        if (ruleId) {
+          const rule = rules.find(r => r.id === ruleId);
+
+          if (rule) {
+            elements.ruleName.value = rule.name;
+            elements.ruleContent.value = rule.content;
+          }
+        } else {
+          elements.ruleName.value = '';
+          elements.ruleContent.value = '';
+        }
+      }
+    }
+
+    function hideRuleEdit() {
+      if (elements.ruleEditDialog) {
+        elements.ruleEditDialog.classList.remove('active');
+      }
+    }
+
+    function addNewRule() {
+      showRuleEdit();
+    }
+
+    function saveRule() {
+      const name = elements.ruleName.value.trim();
+      const content = elements.ruleContent.value.trim();
+
+      if (!name || !content) return;
+
+      if (currentRuleId) {
+        const index = rules.findIndex(r => r.id === currentRuleId);
+
+        if (index !== -1) {
+          rules[index] = {
+            ...rules[index],
+            name,
+            content,
+            selected: false,
+          };
+        }
+      } else {
+        rules.push({
+          id: Date.now().toString(),
+          name,
+          content,
+          selected: false,
+        });
+      }
+
+      vscode.postMessage({
+        command: 'saveRules',
+        rules: JSON.stringify(rules)
+      });
+
+      hideRuleEdit();
+      loadRules();
+      updateRulesSelector();
+    }
+
+    function loadRules() {
+      if (!elements.rulesContainer) return;
+      
+      elements.rulesContainer.innerHTML = '';
+
+      rules.forEach(rule => {
+        const ruleElement = document.createElement('div');
+        ruleElement.className = 'rule-item';
+        ruleElement.onclick = () => editRule(rule.id);
+
+        const span = document.createElement('span');
+        span.textContent = rule.name;
+
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+
+        deleteButton.onclick = (e) => {
+          e.stopPropagation();
+          deleteRule(rule.id);
+        };
+
+        ruleElement.appendChild(span);
+        ruleElement.appendChild(deleteButton);
+        elements.rulesContainer.appendChild(ruleElement);
+      });
+    }
+
+    function editRule(ruleId) {
+      showRuleEdit(ruleId);
+    }
+
+    function deleteRule(ruleId) {
+      rules = rules.filter(r => r.id !== ruleId);
+
+      vscode.postMessage({
+        command: 'saveRules',
+        rules: JSON.stringify(rules)
+      });
+
+      loadRules();
+      updateRulesSelector();
+    }
+
+    function updateRulesSelector() {
+      if (!elements.rulesCheckboxContainer) return;
+      
+      elements.rulesCheckboxContainer.innerHTML = '';
+
+      rules.forEach(rule => {
+        const checkboxContainer = document.createElement('div');
+        checkboxContainer.className = 'rule-checkbox';
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = rule.id;
+        checkbox.checked = rule.selected;
+        checkbox.onchange = () => toggleRule(rule.id);
+
+        const label = document.createElement('label');
+        label.htmlFor = rule.id;
+        label.textContent = rule.name;
+
+        checkboxContainer.appendChild(checkbox);
+        checkboxContainer.appendChild(label);
+        elements.rulesCheckboxContainer.appendChild(checkboxContainer);
+      });
+    }
+
+    function toggleRule(ruleId) {
+      rules.forEach(rule => {
+        if (rule.id === ruleId) {
+          rule.selected = !rule.selected;
+        }
+      });
+
+      vscode.postMessage({
+        command: 'saveRules',
+        rules: JSON.stringify(rules)
+      });
+    }
+
+    // Добавляем обработчик сообщений от VS Code
     window.addEventListener('message', ({ data: { command, text, selectedModel } }) => {
       switch (command) {
         case 'ollamaModels':
@@ -254,6 +424,12 @@ export const script = `
         case 'finishStreaming':
           hideTypingIndicator();
           break;
+
+        case 'setRules':
+          rules = JSON.parse(text) || [];
+          loadRules();
+          updateRulesSelector();
+          break;
       }
     });
 
@@ -272,6 +448,15 @@ export const script = `
     window.hideLoadingIndicator = hideLoadingIndicator;
     window.showTypingIndicator = showTypingIndicator;
     window.hideTypingIndicator = hideTypingIndicator;
+    window.showRules = showRules;
+    window.hideRules = hideRules;
+    window.showRuleEdit = showRuleEdit;
+    window.hideRuleEdit = hideRuleEdit;
+    window.addNewRule = addNewRule;
+    window.saveRule = saveRule;
+    window.editRule = editRule;
+    window.deleteRule = deleteRule;
+    window.toggleRule = toggleRule;
 
     // Добавляем обработчик клавиш для textarea
     if (elements.input) {
@@ -295,8 +480,12 @@ export const script = `
       vscode.postMessage({
         command: 'getSeanses',
       });
+
+      vscode.postMessage({
+        command: 'getRules',
+      });
     } catch (e) {
       console.error('Post message error:', e);
     }
-  })();
+  });
 `;

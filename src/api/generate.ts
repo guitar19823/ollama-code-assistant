@@ -6,6 +6,7 @@ interface IParam {
   baseUrl: string;
   prompt: string;
   model: string;
+  rules: { id: string; name: string; content: string; selected: boolean }[];
   onLoading: () => void;
   onStartStreaming: () => void;
   onFinishStreaming: () => void;
@@ -19,6 +20,7 @@ const startStreaming = async ({
   baseUrl,
   prompt,
   model,
+  rules,
   onLoading,
   onStartStreaming,
   onFinishStreaming,
@@ -47,7 +49,13 @@ const startStreaming = async ({
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model,
-        prompt,
+        prompt:
+          rules
+            .filter(r => r.selected)
+            .map(r => r.content)
+            .join('\n') +
+          '\n' +
+          prompt,
         stream: true,
       }),
       signal: controller.signal,
