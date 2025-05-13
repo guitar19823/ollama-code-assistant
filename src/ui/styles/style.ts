@@ -32,6 +32,10 @@ export const style = `
     scrollbar-width: none;
   }
 
+  .nowrap {
+    white-space: nowrap;
+  }
+
   .scroll::-webkit-scrollbar {
     display: none;
   }
@@ -403,7 +407,7 @@ export const style = `
     border: 1px solid var(--vscode-panel-border);
     padding: 10px;
     z-index: 1000;
-    min-width: 100px;
+    min-width: 120px;
     min-height: 50px;
     max-width: 200px;
     max-height: 300px;

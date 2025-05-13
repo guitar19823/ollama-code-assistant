@@ -362,7 +362,7 @@ export const script = `
 
       rules.forEach(rule => {
         const checkboxContainer = document.createElement('div');
-        checkboxContainer.className = 'rule-checkbox';
+        checkboxContainer.className = 'nowrap rule-checkbox';
 
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';

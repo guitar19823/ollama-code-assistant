@@ -6,7 +6,11 @@ export function activate(context: vscode.ExtensionContext) {
   const provider = new ViewProvider(context);
 
   context.subscriptions.push(
-    vscode.window.registerWebviewViewProvider('ai-assistant-view', provider)
+    vscode.window.registerWebviewViewProvider('ai-assistant-view', provider, {
+      webviewOptions: {
+        retainContextWhenHidden: true
+      }
+    })
   );
 
   // Регистрация команды для кнопки в панели быстрого доступа

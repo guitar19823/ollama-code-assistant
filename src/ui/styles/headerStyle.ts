@@ -118,22 +118,19 @@ export const headerStyle = `
     max-height: 200px;
     padding: 5px 0;
     margin-bottom: 5px;
-    border-top: 1px solid var(--cursor-border);
-    border-bottom: 1px solid var(--cursor-border);
   }
 
   .rule-item {
-    padding: 4px;
+    padding: 5px;
     cursor: pointer;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border: 1px solid transparent;
     border-radius: 4px;
   }
 
   .rule-item:hover {
-    border: 1px solid var(--cursor-border);
+    background: var(--cursor-hover);
   }
 
   .rule-item button {
