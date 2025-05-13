@@ -16,7 +16,7 @@ interface IParam {
 let controller: AbortController | null = null;
 let isStreaming = false;
 
-const startStreaming = async ({
+export const startStreaming = async ({
   baseUrl,
   prompt,
   model,
@@ -98,7 +98,7 @@ const startStreaming = async ({
   }
 };
 
-const stopStreaming = () => {
+export const stopStreaming = () => {
   if (controller) {
     controller.abort();
   }
