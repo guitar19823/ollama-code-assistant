@@ -8,6 +8,7 @@ export const script = `
       output: document.getElementById('output'),
       input: document.getElementById('input'),
       modelSelect: document.getElementById('modelSelect'),
+      modelSelectorButton: document.getElementById('modelSelectorButton'),
       loadingIndicator: document.getElementById('loadingIndicator'),
       typingIndicator: document.getElementById('typingIndicator'),
       rulesDialog: document.getElementById('rulesDialog'),
@@ -97,17 +98,21 @@ export const script = `
         elements.modelSelect.innerHTML = '';
         
         models.forEach(model => {
-          const option = document.createElement('option');
-          option.value = model;
+          const option = document.createElement('span');
+          option.className = 'model-option nowrap';
+          option.onclick = () => {
+            changeModel(model);
+            elements.modelSelectorButton.textContent = model;
+          };
           option.textContent = model;
           elements.modelSelect.appendChild(option);
         });
         
         // Сохраняем выбранную модель
         if (selectedModel && models.includes(selectedModel)) {
-          elements.modelSelect.value = selectedModel;
+          elements.modelSelectorButton.textContent = selectedModel;
         } else if (models.length > 0) {
-          elements.modelSelect.value = models[0];
+          elements.modelSelectorButton.textContent = models[0];
 
           changeModel();
         }
@@ -167,12 +172,12 @@ export const script = `
     }
 
     // Обработчик изменения модели
-    function changeModel() {
+    function changeModel(model) {
       if (!elements.modelSelect) return;
 
       vscode.postMessage({
         command: 'changeModel',
-        model: elements.modelSelect.value
+        model
       });
     }
 
@@ -324,17 +329,57 @@ export const script = `
 
         const span = document.createElement('span');
         span.textContent = rule.name;
+        ruleElement.appendChild(span);
 
         const deleteButton = document.createElement('button');
         deleteButton.textContent = 'Delete';
-
         deleteButton.onclick = (e) => {
           e.stopPropagation();
           deleteRule(rule.id);
         };
-
-        ruleElement.appendChild(span);
         ruleElement.appendChild(deleteButton);
+
+        // const svg = document.createElement('svg');
+        // svg.className = 'button-icon';
+        // svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        // svg.setAttribute('width', '24');
+        // svg.setAttribute('height', '24');
+        // svg.setAttribute('viewBox', '0 0 24 24');
+        // svg.setAttribute('fill', 'none');
+        // svg.setAttribute('stroke', 'currentColor');
+        // svg.setAttribute('stroke-width', '2');
+        // svg.setAttribute('stroke-linecap', 'round');
+        // svg.setAttribute('stroke-linejoin', 'round');
+
+        // svg.onclick = (e) => {
+        //   e.stopPropagation();
+        //   deleteRule(rule.id);
+        // };
+
+        // const polyline = document.createElement('polyline');
+        // polyline.setAttribute('points', '3 6 5 6 21 6');
+        // svg.appendChild(polyline);
+
+        // const path = document.createElement('path');
+        // path.setAttribute('d', 'M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2');
+        // svg.appendChild(path);
+
+        // const line1 = document.createElement('line');
+        // line1.setAttribute('x1', '10');
+        // line1.setAttribute('y1', '11');
+        // line1.setAttribute('x2', '10');
+        // line1.setAttribute('y2', '17');
+        // svg.appendChild(line1);
+
+        // const line2 = document.createElement('line');
+        // line2.setAttribute('x1', '14');
+        // line2.setAttribute('y1', '11');
+        // line2.setAttribute('x2', '14');
+        // line2.setAttribute('y2', '17');
+        // svg.appendChild(line2);
+
+        // ruleElement.appendChild(svg);
+
         elements.rulesContainer.appendChild(ruleElement);
       });
     }

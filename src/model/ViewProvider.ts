@@ -50,13 +50,10 @@ class ViewProvider implements vscode.WebviewViewProvider {
             break;
 
           case 'getSettings':
-            vscode.window.showInformationMessage(
-              'Settings: ' + this._context.workspaceState.get('baseUrl')
-            );
             this._view?.webview.postMessage({
               command: 'setSettings',
               text: JSON.stringify({
-                baseUrl: this._context.workspaceState.get('baseUrl'),
+                baseUrl: this._context.globalState.get('baseUrl'),
                 model: this._context.workspaceState.get('model'),
               }),
             });
@@ -79,7 +76,7 @@ class ViewProvider implements vscode.WebviewViewProvider {
             break;
 
           case 'saveSettings':
-            this._context.workspaceState.update('baseUrl', baseUrl);
+            this._context.globalState.update('baseUrl', baseUrl);
             break;
 
           case 'saveRules':
@@ -195,9 +192,9 @@ class ViewProvider implements vscode.WebviewViewProvider {
     });
 
     if (models.length === 0) {
-      vscode.window.showWarningMessage('No models found');
+      vscode.window.showWarningMessage('No models found!');
     } else {
-      vscode.window.showInformationMessage('Models list updated!');
+      vscode.window.showInformationMessage('Models list updated');
     }
   };
 }

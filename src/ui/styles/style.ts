@@ -182,6 +182,27 @@ export const style = `
     background: var(--cursor-button-hover);
   }
 
+  .margin-right {
+    margin-right: 5px;
+  }
+  
+  .margin-left {
+    margin-left: 5px;
+  }
+
+  .button-icon,
+  .button-icon-not-hover {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    stroke: var(--cursor-text);
+    transition: stroke 0.2s;
+  }
+
+  .button-icon:hover {
+    stroke: var(--cursor-link);
+  }
+
   .label {
     color: var(--cursor-text);
     font-size: 10px;
@@ -272,45 +293,10 @@ export const style = `
     position: relative;
   }
 
-  .button-group-right select {
-    background: var(--cursor-dropdown-bg);
-    color: var(--cursor-text);
-    border: 1px solid var(--cursor-dropdown-border);
-    border-radius: 4px;
-    padding: 4px 8px;
-    font-size: 10px;
-    height: 20px;
-    cursor: pointer;
-    outline: none;
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    padding-right: 24px;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  }
-
-  .button-group-right::after {
-    content: '▼';
-    position: absolute;
-    right: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--cursor-text);
-    font-size: 8px;
-    pointer-events: none;
-  }
-
-  .button-group-right select:hover {
-    background: var(--cursor-dropdown-hover);
-  }
-
-  .button-group-right select:focus {
-    border-color: var(--cursor-input-focus);
-  }
-
   .button-group {
     display: flex;
     align-items: center;
+    height: 20px;
   }
 
   .space-between {
@@ -339,8 +325,6 @@ export const style = `
 
   .typing-indicator {
     height: 20px;
-    margin: 0 2px 0 8px;
-    padding-bottom: 6px;
     display: none;
   }
 
@@ -349,21 +333,21 @@ export const style = `
   }
 
   .typing-indicator .dot {
-    margin: 0 1px;
+    margin-left: 1px;
     color: var(--cursor-text);
-    font-size: 14px;
+    font-size: 16px;
   }
 
   .typing-indicator .dot:nth-child(1) {
-    animation: typing-indicator-animation-1 1.5s infinite;
+    animation: typing-indicator-animation-1 1s infinite;
   }
 
   .typing-indicator .dot:nth-child(2) {
-    animation: typing-indicator-animation-2 1.5s infinite;
+    animation: typing-indicator-animation-2 1s infinite;
   }
 
   .typing-indicator .dot:nth-child(3) {
-    animation: typing-indicator-animation-3  1.5s infinite;
+    animation: typing-indicator-animation-3 1s infinite;
   }
 
   @keyframes typing-indicator-animation-1 {
@@ -395,14 +379,34 @@ export const style = `
     align-items: center;
   }
 
-  .rules-selector-container {
+  .selector-container {
     position: relative;
   }
 
-  .rules-selector {
+  .selector-container > span {
+    white-space: nowrap;
+    background: var(--cursor-dropdown-bg);
+    color: var(--cursor-text);
+    border: 1px solid var(--cursor-dropdown-border);
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 10px;
+    height: 20px;
+    cursor: pointer;
+    outline: none;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.2s;
+  }
+
+  .selector-container > span:hover {
+    background: var(--cursor-dropdown-hover);
+  }
+
+  .selector {
     position: absolute;
     bottom: 20px;
-    left: -5px;
+    right: -2px;
     background-color: var(--vscode-editor-background);
     border: 1px solid var(--vscode-panel-border);
     padding: 10px;
@@ -416,7 +420,7 @@ export const style = `
     border-radius: 4px;
   }
 
-  .rules-selector-content {
+  .selector-content {
     -ms-overflow-style: none;
     scrollbar-width: none;
     overflow-y: auto;
@@ -424,7 +428,7 @@ export const style = `
     max-height: 280px;
   }
 
-  .rules-selector-container:hover .rules-selector {
+  .selector-container:hover .selector {
     display: block;
   }
 
@@ -433,10 +437,23 @@ export const style = `
     align-items: center;
     gap: 8px;
     padding: 5px 0;
+    font-size: 10px;
+    cursor: pointer;
+    color: var(--cursor-text);
   }
 
   .rule-checkbox input[type="checkbox"] {
     margin: 0;
     outline: none;
+  }
+  
+  .model-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 0; 
+    font-size: 10px;
+    cursor: pointer;
+    color: var(--cursor-text);
   }
 `;
