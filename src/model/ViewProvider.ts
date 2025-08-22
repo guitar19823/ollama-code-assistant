@@ -105,7 +105,7 @@ class ViewProvider implements vscode.WebviewViewProvider {
       return;
     }
 
-    const baseUrl: string | undefined = this._context.workspaceState.get('baseUrl');
+    const baseUrl: string | undefined = this._context.globalState.get('baseUrl');
 
     if (!baseUrl) {
       vscode.window.showWarningMessage('Base URL is not found!');
@@ -176,7 +176,7 @@ class ViewProvider implements vscode.WebviewViewProvider {
       return;
     }
 
-    const baseUrl: string | undefined = this._context.workspaceState.get('baseUrl');
+    const baseUrl: string | undefined = this._context.globalState.get('baseUrl');
 
     if (!baseUrl) {
       vscode.window.showWarningMessage('Base URL is not found!');
